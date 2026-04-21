@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wojtek — Misja Matematyka</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f; --panel: #12121a; --border: #1e1e2e;
+    --accent: #ff3e3e; --accent2: #ff8c00; --gold: #ffd700;
+    --green: #39ff14; --text: #e8e8f0; --muted: #5a5a7a;
+    --danger: #ff1744; --good: #00e676;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(255,62,62,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,62,62,0.03) 1px, transparent 1px);
+    background-size: 40px 40px; z-index: 0; pointer-events: none;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; position: relative; z-index: 1; }
+
+  header { text-align: center; padding: 3rem 0 2rem; }
+  .label-tag {
+    display: inline-block; font-family: 'Space Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.2em; color: var(--accent); border: 1px solid var(--accent);
+    padding: 0.3rem 1rem; margin-bottom: 1.2rem; text-transform: uppercase;
+    animation: pulse-border 2s ease-in-out infinite;
+  }
+  @keyframes pulse-border {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,62,62,0); }
+    50% { box-shadow: 0 0 10px 2px rgba(255,62,62,0.3); }
+  }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.5rem, 10vw, 7rem); line-height: 0.95;
+    background: linear-gradient(135deg, #fff 0%, #ff3e3e 50%, #ff8c00 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem;
+  }
+  .subtitle { font-family: 'Space Mono', monospace; font-size: 0.85rem; color: var(--muted); letter-spacing: 0.1em; }
+
+  /* COUNTDOWN */
+  .countdown-strip {
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%);
+    padding: 1rem 2rem; display: flex; align-items: center; justify-content: center;
+    gap: 2rem; margin: 2rem 0; clip-path: polygon(0 0, 100% 0, 97% 100%, 3% 100%); flex-wrap: wrap;
+  }
+  .countdown-label { font-family: 'Space Mono', monospace; font-size: 0.75rem; letter-spacing: 0.15em; color: rgba(255,255,255,0.8); text-transform: uppercase; }
+  .countdown-days { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: #fff; line-height: 1; }
+  .countdown-deadline { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: rgba(255,255,255,0.9); font-weight: 700; }
+
+  /* CARDS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 2rem 0; }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--border); padding: 1.5rem; position: relative; overflow: hidden; transition: transform 0.2s, border-color 0.2s; }
+  .card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .card-label { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.5rem; }
+  .card-value { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; line-height: 1; margin-bottom: 0.3rem; }
+  .card-value.danger { color: var(--danger); }
+  .card-value.gold { color: var(--gold); }
+  .card-sub { font-size: 0.8rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+  /* PROGRESS */
+  .progress-section { background: var(--panel); border: 1px solid var(--border); padding: 2rem; margin: 1.5rem 0; position: relative; }
+  .progress-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold)); }
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem; }
+  .progress-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.05em; }
+  .progress-pct { font-family: 'Space Mono', monospace; font-size: 0.9rem; color: var(--accent2); }
+  .progress-track { height: 24px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); position: relative; overflow: visible; margin-bottom: 0.75rem; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--danger), var(--accent2)); transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1); }
+  .target-line { position: absolute; top: -4px; bottom: -4px; width: 3px; background: var(--gold); z-index: 2; }
+  .target-line::after { content: 'CEL 1.8'; position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--gold); white-space: nowrap; }
+  .scale-labels { display: flex; justify-content: space-between; font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-top: 0.5rem; }
+
+  /* CHART */
+  .chart-section { background: var(--panel); border: 1px solid var(--border); padding: 2rem; margin: 1.5rem 0; position: relative; }
+  .chart-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--gold), var(--green)); }
+  .chart-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.05em; margin-bottom: 1.5rem; }
+  canvas#chart { width: 100% !important; display: block; }
+
+  /* GRADES TABLE */
+  .grades-section { background: var(--panel); border: 1px solid var(--border); padding: 2rem; margin: 1.5rem 0; position: relative; }
+  .grades-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--green), var(--accent2)); }
+  .grades-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; margin-bottom: 1.2rem; }
+
+  .grades-table { width: 100%; border-collapse: collapse; }
+  .grades-table th {
+    font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--muted); text-align: left;
+    padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border);
+  }
+  .grades-table td { padding: 0.55rem 0.75rem; font-family: 'Space Mono', monospace; font-size: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .grades-table tr:last-child td { border-bottom: none; }
+  .grades-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge-waga {
+    display: inline-block; padding: 0.15rem 0.5rem;
+    font-size: 0.65rem; font-family: 'Space Mono', monospace;
+    border: 1px solid; border-radius: 2px;
+  }
+  .badge-waga.w02 { color: #7eb8ff; border-color: rgba(126,184,255,0.3); background: rgba(126,184,255,0.05); }
+  .badge-waga.w04 { color: var(--accent2); border-color: rgba(255,140,0,0.3); background: rgba(255,140,0,0.05); }
+  .badge-waga.w06 { color: var(--danger); border-color: rgba(255,23,68,0.3); background: rgba(255,23,68,0.05); }
+
+  .grade-val { font-weight: 700; }
+  .grade-val.low { color: var(--danger); }
+  .grade-val.mid { color: var(--accent2); }
+  .grade-val.high { color: var(--good); }
+
+  .no-data { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--muted); padding: 1rem 0; }
+
+  /* STATUS */
+  .status-banner { padding: 1.2rem 1.5rem; margin: 1.5rem 0; font-family: 'Space Mono', monospace; font-size: 0.85rem; line-height: 1.6; border-left: 4px solid var(--accent); }
+  .status-banner.ok { border-color: var(--good); background: rgba(0,230,118,0.05); }
+  .status-banner.warn { border-color: var(--gold); background: rgba(255,215,0,0.05); }
+  .status-banner.bad { border-color: var(--danger); background: rgba(255,23,68,0.05); }
+
+  /* QUOTE */
+  .quote-card { background: linear-gradient(135deg, rgba(255,62,62,0.08), rgba(255,140,0,0.06)); border: 1px solid rgba(255,140,0,0.2); padding: 2rem; margin: 1.5rem 0; text-align: center; }
+  .quote-day { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; color: var(--accent2); margin-bottom: 1rem; text-transform: uppercase; }
+  .quote-text { font-size: 1.3rem; font-weight: 600; line-height: 1.5; color: #fff; margin-bottom: 1rem; font-style: italic; }
+  .quote-text::before { content: '„'; color: var(--accent); }
+  .quote-text::after { content: '"'; color: var(--accent); }
+  .quote-author { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--muted); }
+
+  /* ERROR */
+  .error-box { background: rgba(255,23,68,0.08); border: 1px solid rgba(255,23,68,0.3); border-left: 4px solid var(--danger); padding: 1.2rem 1.5rem; margin: 1.5rem 0; font-family: 'Space Mono', monospace; font-size: 0.8rem; line-height: 1.7; display: none; }
+  .error-box code { color: var(--accent2); background: rgba(255,255,255,0.05); padding: 0.1rem 0.4rem; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .card, .progress-section, .chart-section, .grades-section, .quote-card, .status-banner { animation: fadeUp 0.5s ease both; }
+
+  footer { text-align: center; padding: 3rem 0 2rem; font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="label-tag">⚠ Operacja: Zalicz Matmę</div>
+    <h1>WOJTEK<br>VS MATEMATYKA</h1>
+    <p class="subtitle">Misja: Średnia ważona 1.8 do 10 czerwca 2026</p>
+  </header>
+
+  <div class="countdown-strip">
+    <div><div class="countdown-label">Dni do deadline'u</div><div class="countdown-days" id="daysLeft">—</div></div>
+    <div><div class="countdown-label">Deadline</div><div class="countdown-deadline">10 CZERWCA 2026</div></div>
+    <div><div class="countdown-label">Dzisiaj</div><div class="countdown-deadline" id="todayDate">—</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-label">📊 Średnia ważona</div>
+      <div class="card-value danger" id="currentAvg">—</div>
+      <div class="card-sub" id="currentGradeCount">Ładowanie...</div>
+    </div>
+    <div class="card">
+      <div class="card-label">🎯 Cel do osiągnięcia</div>
+      <div class="card-value gold">1.80</div>
+      <div class="card-sub">Minimalna średnia z matematyki</div>
+    </div>
+  </div>
+
+  <div class="status-banner bad" id="statusBanner">Ładowanie ocen z pliku oceny.json…</div>
+
+  <div class="progress-section">
+    <div class="progress-header">
+      <div class="progress-title">📈 Postęp do celu</div>
+      <div class="progress-pct" id="progressPct">— %</div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      <div class="target-line" style="left: 16%"></div>
+    </div>
+    <div class="scale-labels">
+      <span>1.0</span><span>2.0</span><span>3.0</span><span>4.0</span><span>5.0</span><span>6.0</span>
+    </div>
+  </div>
+
+  <div class="chart-section">
+    <div class="chart-title">📉 Wykres ocen</div>
+    <canvas id="chart" height="200"></canvas>
+  </div>
+
+  <div class="grades-section">
+    <div class="grades-title">📋 Lista ocen</div>
+    <div class="error-box" id="errorBox">
+      ❌ Nie można załadować pliku <code>oceny.json</code>.<br>
+      Upewnij się, że plik istnieje w tym samym folderze co strona i ma poprawny format JSON:<br><br>
+      <code>[ { "ocena": 3, "waga": 0.6, "data": "2026-04-01" }, ... ]</code><br><br>
+      Wagi: <code>0.2</code> = mała &nbsp; <code>0.4</code> = średnia &nbsp; <code>0.6</code> = duża
+    </div>
+    <table class="grades-table" id="gradesTable" style="display:none">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Ocena</th>
+          <th>Waga</th>
+          <th>Data</th>
+          <th>Wpływ</th>
+        </tr>
+      </thead>
+      <tbody id="gradesBody"></tbody>
+    </table>
+    <div class="no-data" id="noData" style="display:none">Brak ocen w pliku.</div>
+  </div>
+
+  <div class="quote-card">
+    <div class="quote-day" id="quoteDay">Cytat na dziś</div>
+    <div class="quote-text" id="quoteText">Ładowanie...</div>
+    <div class="quote-author" id="quoteAuthor"></div>
+  </div>
+
+</div>
+<footer>WOJTEK MATEMATYKA CHALLENGE · MISJA AKTYWNA · POWODZENIA WOJTEK 💪</footer>
+
+<script>
+let grades = [];
+
+const quotes = [
+  { text: "Matematyka to nie tortura. To trening mózgu. A Twój mózg jest gotowy.", author: "— Coach Wojtek" },
+  { text: "Każda godzina nauki to jeden krok bliżej do tej 1.8. Licz.", author: "— Kalkulator Przeznaczenia" },
+  { text: "Łatwe rzeczy są dla tych, co się nie rozwijają. Ty się rozwijasz.", author: "— Euklides (prawie)" },
+  { text: "Wzory można wykuć. Wolę widzieć kogoś, kto kuć nie odmawia.", author: "— Każdy dobry nauczyciel" },
+  { text: "Nie pytaj co matematyka może zrobić dla Ciebie. Zapytaj co Ty możesz zrobić dla swojej matury.", author: "— Filozof z ławki" },
+  { text: "10 czerwca to nie koniec. To punkt startowy nowego Wojtka.", author: "— Przyszłość" },
+  { text: "Trudność zadania jest wprost proporcjonalna do Twojego wzrostu po jej rozwiązaniu.", author: "— Twierdzenie Wojtka" },
+  { text: "Jeden dzień nauki dzisiaj = mniej strachu jutro.", author: "— Prosta Arytmetyka Życia" },
+  { text: "Nawet Gauss zaczynał od podstaw. Zacznij teraz.", author: "— Carl Friedrich Gauss (serio)" },
+  { text: "Zraź się raz. Odpocznij chwilę. Wróć do zadań. To właśnie zwycięstwo.", author: "— Wojtek, przyszłość" },
+  { text: "Średnia 1.8 nie spada z nieba. Ale można ją zbudować ocena po ocenie.", author: "— Statystyka" },
+  { text: "Najlepsza pora na naukę była wczoraj. Druga najlepsza – teraz.", author: "— Przysłowie (zaadaptowane)" },
+  { text: "Nie musisz kochać matematyki. Musisz ją tylko zdać.", author: "— Pragmatyczny Mentor" },
+  { text: "Strach przed klasówką jest mniejszy niż żal z powodu nierobienia nic.", author: "— Twoja Przyszłość" },
+  { text: "Każde zadanie, które rozwiążesz, to jedno mniej na sprawdzianie.", author: "— Rachunek Prawdopodobieństwa" },
+];
+
+async function init() {
+  updateCountdown();
+  updateQuote();
+  setInterval(updateCountdown, 60000);
+  await loadGrades();
+}
+
+function updateCountdown() {
+  const deadline = new Date('2026-06-10T23:59:59');
+  const now = new Date();
+  const days = Math.max(0, Math.ceil((deadline - now) / (1000 * 60 * 60 * 24)));
+  document.getElementById('daysLeft').textContent = days;
+  document.getElementById('todayDate').textContent = now.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function updateQuote() {
+  const d = new Date();
+  const idx = (d.getDate() + d.getMonth() * 31) % quotes.length;
+  const q = quotes[idx];
+  const dayNames = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
+  document.getElementById('quoteDay').textContent = `Motywacja na dziś — ${dayNames[d.getDay()]}`;
+  document.getElementById('quoteText').textContent = q.text;
+  document.getElementById('quoteAuthor').textContent = q.author;
+}
+
+async function loadGrades() {
+  try {
+    const res = await fetch('oceny.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error('JSON musi być tablicą');
+    grades = data.filter(g => typeof g.ocena === 'number' && [0.2, 0.4, 0.6].includes(g.waga));
+    renderTable();
+    updateStats();
+    drawChart();
+  } catch (err) {
+    document.getElementById('errorBox').style.display = 'block';
+    document.getElementById('gradesTable').style.display = 'none';
+    document.getElementById('noData').style.display = 'none';
+    const b = document.getElementById('statusBanner');
+    b.className = 'status-banner bad';
+    b.textContent = '❌ Nie można załadować oceny.json — sprawdź czy plik istnieje obok strony.';
+    document.getElementById('currentAvg').textContent = '!';
+    document.getElementById('currentGradeCount').textContent = 'błąd ładowania';
+    drawChart();
+  }
+}
+
+// Weighted average: sum(ocena * waga) / sum(waga)
+function weightedAvg(arr) {
+  if (!arr.length) return 0;
+  const sumW = arr.reduce((s, g) => s + g.waga, 0);
+  const sumGW = arr.reduce((s, g) => s + g.ocena * g.waga, 0);
+  return sumGW / sumW;
+}
+
+function wagaLabel(w) {
+  if (w === 0.2) return { cls: 'w02', txt: '0.2 — mała' };
+  if (w === 0.4) return { cls: 'w04', txt: '0.4 — średnia' };
+  return { cls: 'w06', txt: '0.6 — duża' };
+}
+
+function gradeClass(v) {
+  if (v >= 3) return 'high';
+  if (v >= 2) return 'mid';
+  return 'low';
+}
+
+function renderTable() {
+  const err = document.getElementById('errorBox');
+  const tbl = document.getElementById('gradesTable');
+  const nd = document.getElementById('noData');
+  err.style.display = 'none';
+
+  if (!grades.length) { tbl.style.display = 'none'; nd.style.display = 'block'; return; }
+  nd.style.display = 'none'; tbl.style.display = 'table';
+
+  const totalW = grades.reduce((s, g) => s + g.waga, 0);
+  const body = document.getElementById('gradesBody');
+  body.innerHTML = grades.map((g, i) => {
+    const wl = wagaLabel(g.waga);
+    const gc = gradeClass(g.ocena);
+    const impact = ((g.ocena * g.waga / totalW)).toFixed(3);
+    return `<tr>
+      <td style="color:var(--muted)">${i + 1}</td>
+      <td><span class="grade-val ${gc}">${g.ocena}</span></td>
+      <td><span class="badge-waga ${wl.cls}">${wl.txt}</span></td>
+      <td style="color:var(--muted)">${g.data || '—'}</td>
+      <td style="color:var(--muted);font-size:0.72rem">+${impact}</td>
+    </tr>`;
+  }).join('');
+}
+
+function updateStats() {
+  const target = 1.8;
+  if (!grades.length) {
+    document.getElementById('currentAvg').textContent = '—';
+    document.getElementById('currentGradeCount').textContent = 'Brak ocen w pliku';
+    document.getElementById('progressPct').textContent = '— %';
+    document.getElementById('progressFill').style.width = '0%';
+    const b = document.getElementById('statusBanner');
+    b.className = 'status-banner bad'; b.textContent = 'Brak ocen w pliku oceny.json.';
+    return;
+  }
+  const avg = weightedAvg(grades);
+  const ar = Math.round(avg * 100) / 100;
+  document.getElementById('currentAvg').textContent = ar.toFixed(2);
+  const n = grades.length;
+  document.getElementById('currentGradeCount').textContent = `${n} ocen${n===1?'a':n<5?'y':''}  ·  suma wag: ${grades.reduce((s,g)=>s+g.waga,0).toFixed(1)}`;
+
+  const pct = Math.max(0, Math.min(100, ((avg - 1) / 5) * 100));
+  document.getElementById('progressFill').style.width = pct.toFixed(1) + '%';
+  document.getElementById('progressPct').textContent = pct.toFixed(0) + '%';
+
+  const b = document.getElementById('statusBanner');
+  if (avg >= target) {
+    b.className = 'status-banner ok';
+    b.innerHTML = `✅ JESTEŚ NA CELU! Twoja średnia ważona ${ar.toFixed(2)} przekracza wymaganą 1.8. Utrzymaj tempo!`;
+  } else {
+    b.className = 'status-banner warn';
+    const need = calcNeeded(avg, grades, target);
+    if (need) {
+      b.innerHTML = `⚡ Do celu brakuje <strong>${(target - avg).toFixed(2)}</strong> pkt. Potrzebujesz ok. <strong>${need.count} ocen(y) na ${need.grade}</strong> z wagą 0.6, żeby dobić do 1.8. Dasz radę Wojtek!`;
+    } else {
+      b.innerHTML = `⚡ Obecna średnia ważona: ${ar.toFixed(2)} — cel: 1.8. Zbieraj lepsze oceny!`;
+    }
+  }
+}
+
+function calcNeeded(currentAvg, currentGrades, target) {
+  const curSumW = currentGrades.reduce((s, g) => s + g.waga, 0);
+  const curSumGW = currentGrades.reduce((s, g) => s + g.ocena * g.waga, 0);
+  for (let grade = 6; grade >= 2; grade -= 1) {
+    for (let n = 1; n <= 15; n++) {
+      const newSumGW = curSumGW + grade * 0.6 * n;
+      const newSumW = curSumW + 0.6 * n;
+      if (newSumGW / newSumW >= target) return { count: n, grade };
+    }
+  }
+  return null;
+}
+
+function drawChart() {
+  const canvas = document.getElementById('chart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.parentElement.clientWidth - 64;
+  const h = 220;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+
+  const pad = { t: 20, r: 20, b: 40, l: 42 };
+  const cW = w - pad.l - pad.r, cH = h - pad.t - pad.b;
+
+  // Grid
+  for (let g = 1; g <= 6; g++) {
+    const y = pad.t + cH - ((g - 1) / 5) * cH;
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + cW, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = '10px Space Mono, monospace';
+    ctx.textAlign = 'right'; ctx.fillText(g, pad.l - 6, y + 4);
+  }
+
+  // Target line 1.8
+  const tY = pad.t + cH - ((1.8 - 1) / 5) * cH;
+  ctx.setLineDash([6, 4]); ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(pad.l, tY); ctx.lineTo(pad.l + cW, tY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#ffd700'; ctx.font = 'bold 10px Space Mono, monospace';
+  ctx.textAlign = 'left'; ctx.fillText('CEL 1.8', pad.l + 4, tY - 5);
+
+  if (!grades.length) {
+    ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = '14px DM Sans, sans-serif';
+    ctx.textAlign = 'center'; ctx.fillText('Brak danych', pad.l + cW / 2, pad.t + cH / 2);
+    return;
+  }
+
+  const step = grades.length > 1 ? cW / (grades.length - 1) : cW / 2;
+
+  // Running weighted average line
+  const avgPts = grades.map((g, i) => {
+    const slice = grades.slice(0, i + 1);
+    const ra = weightedAvg(slice);
+    return { x: pad.l + (grades.length > 1 ? i * step : cW / 2), y: pad.t + cH - ((ra - 1) / 5) * cH };
+  });
+
+  if (avgPts.length > 1) {
+    const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + cH);
+    grad.addColorStop(0, 'rgba(255,140,0,0.15)'); grad.addColorStop(1, 'rgba(255,140,0,0)');
+    ctx.beginPath(); ctx.moveTo(avgPts[0].x, pad.t + cH);
+    avgPts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(avgPts[avgPts.length - 1].x, pad.t + cH);
+    ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+
+    ctx.beginPath(); ctx.strokeStyle = '#ff8c00'; ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+    avgPts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.stroke();
+  }
+
+  // Dots — size proportional to weight
+  grades.forEach((g, i) => {
+    const x = pad.l + (grades.length > 1 ? i * step : cW / 2);
+    const y = pad.t + cH - ((g.ocena - 1) / 5) * cH;
+    const radius = g.waga === 0.6 ? 9 : g.waga === 0.4 ? 7 : 5;
+    const color = g.ocena >= 3 ? '#39ff14' : g.ocena >= 2 ? '#ff8c00' : '#ff1744';
+    ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = color; ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = '#fff'; ctx.font = `bold ${g.waga === 0.6 ? 11 : 10}px Space Mono, monospace`;
+    ctx.textAlign = 'center'; ctx.fillText(g.ocena, x, y - radius - 4);
+  });
+
+  // X labels
+  ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '9px Space Mono, monospace'; ctx.textAlign = 'center';
+  grades.forEach((g, i) => {
+    ctx.fillText(`#${i + 1}`, pad.l + (grades.length > 1 ? i * step : cW / 2), pad.t + cH + 16);
+  });
+
+  // Legend
+  ctx.fillStyle = '#ff8c00'; ctx.fillRect(pad.l, h - 14, 20, 3);
+  ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = '9px Space Mono, monospace';
+  ctx.textAlign = 'left'; ctx.fillText('Średnia ważona bieżąca', pad.l + 26, h - 10);
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.fillText('(rozmiar kropki = waga oceny)', pad.l + 200, h - 10);
+}
+
+window.addEventListener('resize', drawChart);
+init();
+</script>
+</body>
+</html>
