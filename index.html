@@ -218,23 +218,42 @@
 <script>
 let grades = [];
 
-const quotes = [
-  { text: "Matematyka to nie tortura. To trening mózgu. A Twój mózg jest gotowy.", author: "— Coach Wojtek" },
-  { text: "Każda godzina nauki to jeden krok bliżej do tej 1.8. Licz.", author: "— Kalkulator Przeznaczenia" },
-  { text: "Łatwe rzeczy są dla tych, co się nie rozwijają. Ty się rozwijasz.", author: "— Euklides (prawie)" },
-  { text: "Wzory można wykuć. Wolę widzieć kogoś, kto kuć nie odmawia.", author: "— Każdy dobry nauczyciel" },
-  { text: "Nie pytaj co matematyka może zrobić dla Ciebie. Zapytaj co Ty możesz zrobić dla swojej matury.", author: "— Filozof z ławki" },
-  { text: "10 czerwca to nie koniec. To punkt startowy nowego Wojtka.", author: "— Przyszłość" },
-  { text: "Trudność zadania jest wprost proporcjonalna do Twojego wzrostu po jej rozwiązaniu.", author: "— Twierdzenie Wojtka" },
-  { text: "Jeden dzień nauki dzisiaj = mniej strachu jutro.", author: "— Prosta Arytmetyka Życia" },
-  { text: "Nawet Gauss zaczynał od podstaw. Zacznij teraz.", author: "— Carl Friedrich Gauss (serio)" },
-  { text: "Zraź się raz. Odpocznij chwilę. Wróć do zadań. To właśnie zwycięstwo.", author: "— Wojtek, przyszłość" },
-  { text: "Średnia 1.8 nie spada z nieba. Ale można ją zbudować ocena po ocenie.", author: "— Statystyka" },
-  { text: "Najlepsza pora na naukę była wczoraj. Druga najlepsza – teraz.", author: "— Przysłowie (zaadaptowane)" },
-  { text: "Nie musisz kochać matematyki. Musisz ją tylko zdać.", author: "— Pragmatyczny Mentor" },
-  { text: "Strach przed klasówką jest mniejszy niż żal z powodu nierobienia nic.", author: "— Twoja Przyszłość" },
-  { text: "Każde zadanie, które rozwiążesz, to jedno mniej na sprawdzianie.", author: "— Rachunek Prawdopodobieństwa" },
+// ── CYTATY ──────────────────────────────────────────────────────────────────
+// Cytaty są ładowane z pliku cytaty.json w tym samym folderze.
+// Format pliku:
+// [
+//   { "text": "Twój cytat tutaj.", "autor": "— Autor" },
+//   ...
+// ]
+const FALLBACK_QUOTES = [
+  { text: "Średnia 1.8 nie spada z nieba. Ale można ją zbudować ocena po ocenie.", autor: "— Statystyka" },
+  { text: "Nie musisz kochać matematyki. Musisz ją tylko zdać.", autor: "— Pragmatyczny Mentor" }
 ];
+
+async function loadQuotes() {
+  try {
+    const res = await fetch('cytaty.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) throw new Error('Pusta tablica');
+    return data;
+  } catch (err) {
+    console.warn('Nie można załadować cytaty.json, używam fallbacku:', err.message);
+    return FALLBACK_QUOTES;
+  }
+}
+
+async function updateQuote() {
+  const quotes = await loadQuotes();
+  const d = new Date();
+  const idx = (d.getDate() + d.getMonth() * 31) % quotes.length;
+  const q = quotes[idx];
+  const dayNames = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
+  document.getElementById('quoteDay').textContent = `Motywacja na dziś — ${dayNames[d.getDay()]}`;
+  document.getElementById('quoteText').textContent = q.text;
+  document.getElementById('quoteAuthor').textContent = q.autor || q.author || '';
+}
+// ────────────────────────────────────────────────────────────────────────────
 
 function parseGrade(val) {
   if (typeof val === 'number') return val;
@@ -264,16 +283,6 @@ function updateCountdown() {
   document.getElementById('todayDate').textContent = now.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-function updateQuote() {
-  const d = new Date();
-  const idx = (d.getDate() + d.getMonth() * 31) % quotes.length;
-  const q = quotes[idx];
-  const dayNames = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
-  document.getElementById('quoteDay').textContent = `Motywacja na dziś — ${dayNames[d.getDay()]}`;
-  document.getElementById('quoteText').textContent = q.text;
-  document.getElementById('quoteAuthor').textContent = q.author;
-}
-
 async function loadGrades() {
   try {
     const res = await fetch('oceny.json');
@@ -283,8 +292,8 @@ async function loadGrades() {
     
     grades = data.map(g => ({
       ...g,
-      ocenaWyswietlana: g.ocena, // zachowujemy oryginał (np. "3+")
-      ocena: parseGrade(g.ocena)  // konwertujemy na liczbę (np. 3.75)
+      ocenaWyswietlana: g.ocena,
+      ocena: parseGrade(g.ocena)
     })).filter(g => !isNaN(g.ocena) && [0.2, 0.4, 0.6].includes(g.waga));
 
     renderTable();
