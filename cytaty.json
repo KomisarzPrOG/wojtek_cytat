@@ -13,6 +13,7 @@
   { "text": "Najlepsza pora na naukę była wczoraj. Druga najlepsza – teraz.", "autor": "— Przysłowie (zaadaptowane)" },
   { "text": "Nie musisz kochać matematyki. Musisz ją tylko zdać.", "autor": "— Pragmatyczny Mentor" },
   { "text": "Strach przed klasówką jest mniejszy niż żal z powodu nierobienia nic.", "autor": "— Twoja Przyszłość" },
+  { "text": "Kto będzie z nami grał w Achtunga.", "author": "Kordian" },
   { "text": "Każde zadanie, które rozwiążesz, to jedno mniej na sprawdzianie.", "autor": "— Rachunek Prawdopodobieństwa" },
   { "text": "Geniusz to 1% talentu i 99% potu. Zacznij pocić się z matematyki.", "autor": "— Thomas Edison (zaadaptowane)" },
   { "text": "Nie ma skrótu do miejsca, do którego warto dotrzeć.", "autor": "— Beverly Sills" },
@@ -33,6 +34,7 @@
   { "text": "Twój mózg jest jak mięsień. Im więcej go ćwiczysz, tym silniejszy się staje.", "autor": "— Neurobiologia Motywacji" },
   { "text": "Za każdym razem, gdy siadasz do nauki, inwestujesz w siebie. To najlepsza inwestycja.", "autor": "— Warren Buffett Matematyki" },
   { "text": "Nie licz ile zostało. Licz ile już zrobiłeś.", "autor": "— Perspektywa Zwycięzcy" },
+  { "text": "Będzie dobrze.", "author": "Kordian" },
   { "text": "Każda godzina poświęcona nauce to godzina odebrana niepewności.", "autor": "— Równanie Spokoju" },
   { "text": "Możesz narzekać, że matematyka jest trudna. Albo możesz ją opanować. Wybór należy do Ciebie.", "autor": "— Dwa Światy" },
   { "text": "Różnica między osobą, która osiąga cel, a tą, która go nie osiąga, to wytrwałość.", "autor": "— Calvin Coolidge" },
@@ -115,7 +117,5 @@
   { "text": "Twój wynik na maturze to nie koniec historii. To jeden z wielu rozdziałów.", "autor": "— Powieść Życia" },
   { "text": "Rób zadania, których nie rozumiesz. Właśnie dlatego, że ich nie rozumiesz.", "autor": "— Paradoks Nauki" },
   { "text": "Za każdym 'nie umiem' kryje się 'jeszcze nie próbowałem wystarczająco'.", "autor": "— Słownik Możliwości" },
-  { "text": "Wojtek, który nie dał rady, nie istnieje. Istnieje tylko Wojtek, który jeszcze nie skończył próbować.", "autor": "— Definicja Wojtka" },
-  { "text": "Kto będzie z nami grał w Achtunga.", "author": "Kordian" },
-  { "text": "Będzie dobrze.", "author": "Kordian" }
+  { "text": "Wojtek, który nie dał rady, nie istnieje. Istnieje tylko Wojtek, który jeszcze nie skończył próbować.", "autor": "— Definicja Wojtka" }
 ]
